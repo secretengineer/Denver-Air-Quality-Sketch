@@ -1,3 +1,17 @@
 python/api_secrets.py
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+
+# Build & Cache
+.cache/
+
+# OS System Files
+.DS_Store
+Thumbs.db
