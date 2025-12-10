@@ -1,194 +1,133 @@
-# Air Quality Monitoring App
+# 🌬️ Air Quality Monitoring App
 
-The **Air Quality Monitoring App** displays real-time air quality data from the *AQICN* service on the Arduino UNO Q LED matrix. It displays air quality levels ranging from "Good" to "Hazardous" using animated face patterns that reflect the current air quality, from smiling to distressed.
+![Project Banner](assets/docs_assets/aqm-banner.png)
 
-![Air Quality Monitoring App](assets/docs_assets/aqm-banner.png)
+The **Air Quality Monitoring App** displays real-time air quality data from the [AQICN](https://aqicn.org/) service on the Arduino UNO Q LED matrix. It visualizes air quality levels ranging from "Good" to "Hazardous" using animated face patterns that reflect the current air quality—from smiling to distressed.
 
-## Description
+---
 
-The App fetches air quality data from the *AQICN API* for a specified city. It converts numeric AQI values into visual patterns on the 8 x 13 LED matrix. When the air quality changes, the display updates with corresponding emoji icons representing different pollution levels.
+## 📋 Overview
+
+This application bridges the gap between web APIs and hardware. It fetches air quality data for a specific city using Python and displays the result on an Arduino UNO Q's LED matrix.
+
+*   **Python Backend**: Handles API communication, data processing, and error handling.
+*   **Arduino Sketch**: Manages the LED matrix display and polls the Python backend for updates.
+*   **Router Bridge**: Enables seamless communication between the Python environment and the microcontroller.
 
 ![Air Quality Emoji Pattern on LED Matrix](assets/docs_assets/aqm-icons.png)
 
-The Python® script handles API communication and data processing, while the Arduino sketch manages LED matrix display and polling. The Router Bridge enables communication between the Python environment and the microcontroller.
+---
 
-## Bricks Used
+## 📂 Project Structure
 
-**This example does not use any Bricks.** It shows direct Router Bridge communication between Python® and Arduino.
+```text
+Denver-Air-Quality-Sketch/
+├── app.yaml                # Application configuration
+├── assets/                 # Images and documentation assets
+├── python/
+│   ├── api_secrets.py      # API Token storage (Git ignored)
+│   └── main.py             # Main Python script for API fetching
+├── sketch/
+│   ├── air_quality_frames.h # LED Matrix frame definitions
+│   ├── sketch.ino          # Main Arduino sketch
+│   └── sketch.yaml         # Sketch configuration
+└── README.md               # Project documentation
+```
 
-## Hardware and Software Requirements
+---
+
+## 🛠️ Hardware and Software Requirements
 
 ### Hardware
-
-- Arduino UNO Q (x1)
-- USB-C® cable (for power and programming) (x1)
+*   **Arduino UNO Q** (x1)
+*   **USB-C® cable** (for power and programming) (x1)
+*   *(Optional)* USB-C® hub for SBC mode (mouse, keyboard, display)
 
 ### Software
+*   **Arduino App Lab** or compatible environment
+*   **Python 3.x** (if running locally outside App Lab)
 
-- Arduino App Lab
+---
 
-**Note:** You can also run this example using your Arduino UNO Q as a Single Board Computer (SBC) using a [USB-C® hub](https://store.arduino.cc/products/usb-c-to-hdmi-multiport-adapter-with-ethernet-and-usb-hub) with a mouse, keyboard and display attached.
+## 🚀 Getting Started
 
-## How to Use the Example
+### 1. Obtain an API Token
+To display air quality data, you need a free API token from AQICN:
 
-### Obtain an API Token (Required for your city data)
+1.  Visit the [AQICN Token Request Page](https://aqicn.org/data-platform/token/).
+2.  Fill in your details (Name, Email).
+3.  Confirm your email address via the link sent to you.
+4.  Copy your unique API token (e.g., `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0`).
 
-To display air quality data for your specific city, you will need a free API token from AQICN:
+### 2. Configure the Application
 
-1. Visit the AQICN token request page following this link: [https://aqicn.org/data-platform/token/](https://aqicn.org/data-platform/token/)
+**⚠️ Important: Secure your API Token**
 
-![AQICN - Token Request](assets/docs_assets/AQICN-registration-token-1.png)
+To keep your API token secure and out of source control, we use a separate secrets file.
 
-2. Fill in your details and complete the registration form with:
+1.  Navigate to the `python/` directory.
+2.  Create a new file named `api_secrets.py`.
+3.  Add the following code to `api_secrets.py`, replacing the placeholder with your actual token:
 
-- Your email address
-- Name or organization
-- Terms of service agreement
-
-![AQICN - Token Request](assets/docs_assets/AQICN-registration-token-2.png)
-
-3. Check your email. AQICN will send a confirmation email to the address you provided. Click the confirmation link in the email.
-
-![AQICN - Token Request](assets/docs_assets/AQICN-registration-token-3.png)
-
-4. After email confirmation, you'll be redirected to a page displaying your unique API token. It will look something like: 
-   
- ```bash
-a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0
- ```
-
-![AQICN - Token Request](assets/docs_assets/AQICN-registration-token-4.png)
-
-### Configure the Application
-
-1. Clone the example to your workspace
-
-![App Lab - Duplicate Example](assets/docs_assets/air-quality-monitoring-app-clone.png)
-
-2. Update the API token in your code. Open the `main.py` file and locate this line:
-   
- ```python
-# Insert your API token here
-API_TOKEN = "demo"
- ```
-   
-Replace `"demo"` with your actual API token:
-   
- ```python
-# Insert your API token here
-API_TOKEN = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
- ```
-
-3. Set your city. If you want to monitor a different city, update the `city` variable in `main.py`:
-   
- ```python
-city = "Your City Name"
- ```
-
-### Run the App
-
-![App Lab - Run App](assets/docs_assets/app-lab-run-app.png)
-
-## How it Works
-
-Once the application is running, the device performs the following operations:
-
-- **Fetching air quality data from the AQICN API.**
-
- The application makes direct API requests to the AQICN service:
-
- ```python
-import requests
-
-endpoint = f"https://api.waqi.info/feed/{city}/?token={API_TOKEN}"
-response = requests.get(endpoint)
-response_json = response.json()
- ```
+    ```python
+    # python/api_secrets.py
     
- The `get_air_quality()` function handles the API communication, JSON parsing, and error checking. It extracts the AQI value from the response and converts it to a readable category using the `map_aqi_level()` function.
+    # Insert your API token here
+    API_TOKEN = "YOUR_ACTUAL_API_TOKEN_HERE"
+    ```
 
-- **Converting numeric values to readable categories.**
+4.  **Note:** The `.gitignore` file is already configured to ignore `python/api_secrets.py`, so your token won't be accidentally committed to Git.
 
-The `map_aqi_level()` function converts numeric pollution measurements into standard categories:
-
-```python
-def map_aqi_level(aqi_value: int) -> str:
-    for level in AQI_LEVELS:
-        if level["min"] <= aqi_value <= level["max"]:
-             return level["description"]
-    return "N/A"
-```
-
-For example, a pollution reading of 75 is labeled as *Moderate* rather than leaving users to interpret what that number means.
-
-- **Exposing air quality functions to the microcontroller.**
-
-The Router Bridge makes the air quality function callable from the Arduino:
+### 3. Set Your City
+Open `python/main.py` and update the `city` variable to your desired location:
 
 ```python
-Bridge.provide("get_air_quality", get_air_quality)
+# Edit this variable to see your city data 
+city = "Denver" 
 ```
 
-- **Polling for air quality updates from the Arduino.**
+### 4. Run the App
+1.  Connect your Arduino UNO Q.
+2.  Run the project in **Arduino App Lab**.
+3.  The LED matrix should light up and display the current air quality face!
 
-The Arduino sketch calls the Python function once every second:
+---
 
-```arduino
-Bridge.call("get_air_quality").result(airQuality)
+## 🧠 How it Works
+
+### Data Flow
+```mermaid
+graph LR
+    A[AQICN API] -->|JSON Data| B(Python Script)
+    B -->|Processed Level| C{Router Bridge}
+    C -->|Polls Data| D[Arduino Sketch]
+    D -->|Updates| E[LED Matrix]
 ```
 
-Regular checking ensures the display remains current with changing environmental conditions.
+### Python Backend (`python/main.py`)
+*   **`get_air_quality()`**: Fetches data from AQICN, parses the JSON, and determines the AQI level.
+*   **`map_aqi_level()`**: Maps the numeric AQI value to a descriptive string (e.g., "Good", "Moderate").
+*   **`Bridge.provide()`**: Exposes the `get_air_quality` function so the Arduino can call it.
 
-- **Displaying air quality levels on the LED matrix.**
+### Arduino Sketch (`sketch/sketch.ino`)
+*   **`loop()`**: Runs every second. It calls `Bridge.call("get_air_quality")` to get the latest status.
+*   **`matrixWrite()`**: Updates the LED matrix with the frame corresponding to the received air quality level.
+*   **`air_quality_frames.h`**: Contains the binary definitions for the pixel art faces.
 
-The sketch maps each air quality level to corresponding visual patterns:
+---
 
-```arduino
-if (airQuality == "Good") {
-    matrixWrite(good);
-} else if (airQuality == "Moderate") {
-    matrixWrite(moderate);
-} // ... additional levels
-```
+## 📊 AQI Levels & Icons
 
-The high-level data flow looks like this:
+| AQI Range | Level | Description |
+| :--- | :--- | :--- |
+| **0 - 50** | 🟢 Good | Air quality is satisfactory. |
+| **51 - 100** | 🟡 Moderate | Air quality is acceptable. |
+| **101 - 150** | 🟠 Unhealthy for Sensitive Groups | Members of sensitive groups may experience health effects. |
+| **151 - 200** | 🔴 Unhealthy | Everyone may begin to experience health effects. |
+| **201 - 300** | 🟣 Very Unhealthy | Health warnings of emergency conditions. |
+| **300+** | 🟤 Hazardous | Health alert: everyone may experience more serious health effects. |
 
-```
-AQICN API → Python Direct Request → Router Bridge → MCU loop() → LED Matrix
-```
+---
 
-## Understanding the Code
-
-Here is a brief explanation of the application components:
-
-### 🔧 Backend (`main.py`)
-
-The Python® code serves as the system's data processor, handling all communication with the air quality service and converting raw information into a format that the LED display can use.
-
-- **`API_TOKEN`, `city`, `endpoint`**: Simple constants that you edit to target a different location and authenticate with the service.
-
-- **`AQI_LEVELS`**: Table defining category ranges (0-50 = Good, 51-100 = Moderate, etc.) following standard air quality guidelines.
-
-- **`map_aqi_level()`**: Looks up the textual level for a numeric AQI by checking which range the number falls into.
-
-- **`get_air_quality()`**: Makes a direct HTTP request to the AQICN API using the `requests` library, parses the JSON response, validates the status, extracts the AQI value, converts it to a readable level using `map_aqi_level()`, and returns the corresponding level string.
-
-- **`requests.get(endpoint)`**: Performs the actual HTTP GET request to the AQICN API with the configured city and API token.
-
-- **Response validation**: Checks that the API response status is 'ok' and that data is present before processing the AQI value.
-
-- **`Bridge.provide(...)`**: Makes `get_air_quality` callable from the microcontroller, creating the communication link.
-
-- **`App.run()`**: Starts the Router Bridge runtime that enables the Python®-Arduino communication.
-
-### 🔧 Hardware (`sketch.ino`)
-
-The Arduino code is focused on hardware management. It requests information and displays it.
-
-- **`matrixBegin()`**: Initializes the matrix driver, making the LED display ready to show patterns.
-
-- **`Bridge.begin()`**: Opens the serial communication bridge to the host Python® runtime.
-
-- **`loop()`**: Once per second, calls the Python® function, selects the corresponding 13 × 8 frame (`good`, `moderate`, etc.), and shows it with `matrixWrite(frame)`.
-
-- **`air_quality_frames.h`**: Header file that stores the pixel patterns for each air quality level, plus a fallback `unknown` pattern for error cases.
+## 📄 License
+This project is licensed under the **MPL-2.0** License.
