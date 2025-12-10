@@ -7,8 +7,11 @@ from arduino.app_utils import *
 import requests
 
 
-# Insert your API token here
-API_TOKEN = "57b003d04b5adfdad54971d7b68d3cfb572b2530"
+try:
+    from api_secrets import API_TOKEN
+except ImportError:
+    print("Error: api_secrets.py not found. Please create it with your API_TOKEN.")
+    API_TOKEN = ""
 
 # Edit this variable to see your city data 
 city = "Denver"
